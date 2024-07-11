@@ -66,3 +66,21 @@ namespace WindowsFormsApp1
         private System.Windows.Forms.Button submitButton;
     }
 }
+
+
+private void showOptionsButton_Click(object sender, EventArgs e)
+{
+    using (OptionsForm optionsForm = new OptionsForm())
+    {
+        if (optionsForm.ShowDialog() == DialogResult.OK)
+        {
+            List<string> selectedCheckedListBox1Items = optionsForm.SelectedCheckedListBox1Items;
+            List<string> selectedCheckedListBox2Items = optionsForm.SelectedCheckedListBox2Items;
+
+            // 選択された項目を利用して処理を行う（例：PowerPointに出力）
+            string result = "CheckedListBox1: " + string.Join(", ", selectedCheckedListBox1Items) + 
+                            "\nCheckedListBox2: " + string.Join(", ", selectedCheckedListBox2Items);
+            CreatePowerPoint(result);
+        }
+    }
+}
