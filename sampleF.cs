@@ -15,8 +15,17 @@ class Program
         // ファイルを1行ずつ読み込み
         foreach (string line in File.ReadLines(filePath))
         {
+            // 行をトリムして、余計な空白を削除
+            string trimmedLine = line.Trim();
+
+            // `=`が含まれていない行や、`#`で始まる行（コメント行）は無視する
+            if (trimmedLine.StartsWith("#") || !trimmedLine.Contains("="))
+            {
+                continue;
+            }
+
             // 行をキーと値に分割（"="を区切りとして使用）
-            string[] parts = line.Split('=');
+            string[] parts = trimmedLine.Split('=');
 
             if (parts.Length == 2)
             {
