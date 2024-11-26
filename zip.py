@@ -87,3 +87,57 @@ zip_file_name = 'data.zip'      # 作成するZIPファイル名
 process_csv_and_create_zip(zip_file_name, directories_to_zip, modify_csv)
 
 print(f"{zip_file_name} が作成されました！")
+
+
+import os
+import zipfile
+import pandas as pd
+import io
+
+def create_zip_with_cp932(zip_name, directories, modify_function):
+    """
+    CP932エンコーディングで保存し、日本語の文字化けを防いだZIPファイルを作成。
+
+    Parameters:
+        zip_name (str): 出力するZIPファイル名
+        directories (list): 圧縮対象のディレクトリリスト
+        modify_function (function): CSVファイルを処理する関数
+    """
+    with zipfile.ZipFile(zip_name, 'w', compression=zipfile.ZIP_DEFLATED) as zipf:
+        for directory in directories:
+            if os.path.isdir(directory):
+                for root, dirs, files in os.walk(directory):
+                    relative_path = os.path.relpath(root, os.path.dirname(directory))
+                    zip_path = os.path.join("data", relative_path)
+
+                    for file in files:
+                        if file.endswith(".csv"):  # CSVファイルのみ処理
+                            file_path = os.path.join(root, file)
+                            df = pd.read_csv(file_path, encoding='cp932')  # 元CSVをcp932で読み込む
+                            modified_df = modify_function(df)
+
+                            # メモリ上にCSVをcp932で保存
+                            csv_buffer = io.BytesIO()
+                            modified_df.to_csv(csv_buffer, index=False, encoding='cp932')
+                            csv_buffer.seek(0)
+
+                            # バイナリデータをZIPファイルに保存
+                            arcname = os.path.join(zip_path, file)
+                            zipf.writestr(arcname, csv_buffer.read())
+                        else:
+                            # CSV以外のファイルをそのまま追加
+                            file_path = os.path.join(root, file)
+                            arcname = os.path.join(zip_path, file)
+                            zipf.write(file_path, arcname)
+
+# サンプル関数：CSVを加工する（例: 文字列を大文字に変換）
+def modify_csv(df):
+    return df.applymap(lambda x: x.upper() if isinstance(x, str) else x)
+
+# 使用例
+directories_to_zip = ['A', 'B']  # 圧縮対象ディレクトリ
+zip_file_name = 'data_cp932.zip'
+
+create_zip_with_cp932(zip_file_name, directories_to_zip, modify_csv)
+
+print(f"{zip_file_name} が作成されました！")
