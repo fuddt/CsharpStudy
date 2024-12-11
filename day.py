@@ -1,13 +1,15 @@
-import pandas as pd
+import numpy as np
 
-# 開始日と終了日
-start = '2023-01-01'
-end = '2023-01-31'
+# 配列 a と b を定義
+a = np.array([1, 2, 3, 4, 5])
+b = np.array([2, 4, 6])
 
-# 終了日を調整
-adjusted_end = pd.Timestamp(end) + pd.Timedelta(days=6 - pd.Timestamp(end).weekday())
+# 配列 b に含まれる要素だけを a から取り出す
+result = a[np.isin(a, b)]
 
-# 週単位で生成
-periods = pd.period_range(start=start, end=adjusted_end, freq='W')
+# 取り出した結果の形状で True 配列を作成
+true_array = np.full(result.shape, True, dtype=bool)
 
-print(periods)
+print("元の配列 a:", a)
+print("取り出した結果:", result)
+print("全て True の配列:", true_array)
