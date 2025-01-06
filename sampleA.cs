@@ -1,100 +1,44 @@
-using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
+import numpy as np
+import matplotlib.pyplot as plt
 
-public class MainForm : Form
-{
-    public MainForm()
-    {
-        InitializeComponent();
-    }
+# 定数
+frames = 10
+focal_length = 8  # 焦点距離 (mm)
+pixel_pitch = 0.005  # 画素ピッチ (mm/pixel)
+camera_positions = np.array([[i * 2, 0, 10 - i] for i in range(frames)])  # 各フレームのカメラ座標
+yaw_rates = np.linspace(0, 0.5, frames)  # 仮のヨーレート
 
-    private void InitializeComponent()
-    {
-        this.Text = "設定ファイルから生成されたフォーム";
-        this.Size = new System.Drawing.Size(400, 300);
-        this.Load += new EventHandler(Form_Load);
-    }
+# 回転行列を計算
+def compute_rotation_matrix(yaw_rate):
+    theta = np.radians(yaw_rate)
+    return np.array([
+        [np.cos(theta), -np.sin(theta), 0],
+        [np.sin(theta), np.cos(theta), 0],
+        [0, 0, 1]
+    ])
 
-    private void Form_Load(object sender, EventArgs e)
-    {
-        INIParser parser = new INIParser("config.ini");
-        var data = parser.GetData();
+# 投影変換
+def project_to_image(camera_coords, focal_length, pixel_pitch):
+    X_c, Y_c, Z_c = camera_coords
+    u = (focal_length * X_c) / (Z_c * pixel_pitch)
+    v = (focal_length * Y_c) / (Z_c * pixel_pitch)
+    return np.array([u, v])
 
-        int yOffset = 10;
+# 1フレーム目に描画
+base_position = camera_positions[0]
+fig, ax = plt.subplots()
+for i in range(1, frames):
+    # カメラ座標系に変換
+    relative_position = camera_positions[i] - base_position
+    rotation_matrix = compute_rotation_matrix(yaw_rates[i])
+    transformed_position = rotation_matrix.dot(relative_position)
 
-        foreach (var section in data)
-        {
-            GroupBox groupBox = new GroupBox();
-            groupBox.Text = section.Key;
-            groupBox.Size = new System.Drawing.Size(360, 100);
-            groupBox.Location = new System.Drawing.Point(10, yOffset);
+    # 画像座標系に投影
+    image_coords = project_to_image(transformed_position, focal_length, pixel_pitch)
 
-            CheckedListBox checkedListBox = new CheckedListBox();
-            checkedListBox.Items.AddRange(section.Value.ToArray());
-            checkedListBox.Size = new System.Drawing.Size(340, 60);
-            checkedListBox.Location = new System.Drawing.Point(10, 20);
+    # 描画
+    ax.scatter(image_coords[0], image_coords[1], label=f'Frame {i}')
 
-            groupBox.Controls.Add(checkedListBox);
-            this.Controls.Add(groupBox);
-
-            yOffset += 110; // 次のグループボックスの位置を調整
-        }
-    }
-
-    [STAThread]
-    public static void Main()
-    {
-        Application.EnableVisualStyles();
-        Application.SetCompatibleTextRenderingDefault(false);
-        Application.Run(new MainForm());
-    }
-}
-
-using System;
-using System.Collections.Generic;
-using System.IO;
-
-public class INIParser
-{
-    private Dictionary<string, List<string>> data = new Dictionary<string, List<string>>();
-
-    public INIParser(string filePath)
-    {
-        Load(filePath);
-    }
-
-    private void Load(string filePath)
-    {
-        string[] lines = File.ReadAllLines(filePath);
-        string currentSection = "";
-
-        foreach (string line in lines)
-        {
-            if (string.IsNullOrWhiteSpace(line) || line.StartsWith(";"))
-                continue;
-
-            if (line.StartsWith("[") && line.EndsWith("]"))
-            {
-                currentSection = line.Trim('[', ']');
-                if (!data.ContainsKey(currentSection))
-                {
-                    data[currentSection] = new List<string>();
-                }
-            }
-            else
-            {
-                var parts = line.Split('=');
-                if (parts.Length == 2 && parts[0].Trim() == "選択肢")
-                {
-                    data[currentSection].AddRange(parts[1].Split(','));
-                }
-            }
-        }
-    }
-
-    public Dictionary<string, List<string>> GetData()
-    {
-        return data;
-    }
-}
+ax.legend()
+ax.set_title("Projected Points on Frame 1")
+plt.show()
