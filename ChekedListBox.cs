@@ -1,41 +1,28 @@
 using System;
-using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace WindowsFormsApp1
+public class NonActivatedForm : Form
 {
-    public partial class OptionsForm : Form
+    // 子フォームが表示されてもアクティブにならないようにするために
+    // CreateParams をオーバーライドして WS_EX_NOACTIVATE を追加する
+    protected override CreateParams CreateParams
     {
-        public List<string> SelectedCheckedListBox1Items { get; private set; }
-        public List<string> SelectedCheckedListBox2Items { get; private set; }
-
-        public OptionsForm()
+        get
         {
-            InitializeComponent();
-            SelectedCheckedListBox1Items = new List<string>();
-            SelectedCheckedListBox2Items = new List<string>();
+            // 基本のパラメータを取得
+            CreateParams cp = base.CreateParams;
+            // WS_EX_NOACTIVATE の値 0x08000000 を ExStyle に追加
+            cp.ExStyle |= 0x08000000;
+            return cp;
         }
+    }
 
-        private void OptionsForm_Load(object sender, EventArgs e)
-        {
-            checkedListBox1.Items.AddRange(new string[] { "Option 1", "Option 2", "Option 3" });
-            checkedListBox2.Items.AddRange(new string[] { "Option A", "Option B", "Option C" });
-        }
-
-        private void submitButton_Click(object sender, EventArgs e)
-        {
-            foreach (object item in checkedListBox1.CheckedItems)
-            {
-                SelectedCheckedListBox1Items.Add(item.ToString());
-            }
-
-            foreach (object item in checkedListBox2.CheckedItems)
-            {
-                SelectedCheckedListBox2Items.Add(item.ToString());
-            }
-
-            this.DialogResult = DialogResult.OK;
-            this.Close();
-        }
+    public NonActivatedForm()
+    {
+        // 必要に応じた初期化処理
+        this.Text = "非アクティブな子フォーム";
+        this.StartPosition = FormStartPosition.CenterParent;
+        // サイズやその他のプロパティを設定
+        this.Size = new System.Drawing.Size(300, 200);
     }
 }
