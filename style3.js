@@ -8,16 +8,15 @@
   </thead>
   <tbody>
     <tr>
-      <td>データ1</td>
-      <td>データ2</td>
-      <td>データ3</td>
+      <td>短いテキスト</td>
+      <td>すごく長いテキストです。すごく長いテキストです。すごく長いテキストです。すごく長いテキストです。すごく長いテキストです。</td>
+      <td>短い</td>
     </tr>
     <tr>
-      <td>データ4</td>
-      <td>データ5</td>
-      <td>データ6</td>
+      <td>これも短い</td>
+      <td>めちゃめちゃ長い文章がここに入ります。めちゃめちゃ長い文章がここに入ります。めちゃめちゃ長い文章がここに入ります。</td>
+      <td>短文</td>
     </tr>
-    <!-- ... -->
   </tbody>
 </table>
 
@@ -35,11 +34,17 @@
 }
 
 .soft-blue-table th, .soft-blue-table td {
-  border: none;
+  border: 1px solid #d0ebff;
   padding: 10px 16px;
   text-align: left;
   font-size: 15px;
   background: transparent;
+  height: 80px;                /* 80px固定 */
+  max-height: 80px;            /* 最大80px */
+  word-break: break-all;       /* 折り返し */
+  white-space: normal;         /* 折り返し有効 */
+  vertical-align: top;         /* 上揃え */
+  overflow-y: auto;            /* セルごとに縦スクロール */
 }
 
 .soft-blue-table thead th {
@@ -49,6 +54,8 @@
   font-size: 16px;
   letter-spacing: 0.05em;
   border-bottom: 2px solid #b9e2fa;
+  height: 48px;
+  max-height: 48px;
 }
 
 .soft-blue-table tbody tr {
@@ -61,7 +68,7 @@
 }
 
 .soft-blue-table td {
-  vertical-align: middle;
+  vertical-align: top;
 }
 
 .soft-blue-table {
