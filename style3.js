@@ -8,14 +8,14 @@
   </thead>
   <tbody>
     <tr>
-      <td>短いテキスト</td>
-      <td>すごく長いテキストです。すごく長いテキストです。すごく長いテキストです。すごく長いテキストです。すごく長いテキストです。</td>
-      <td>短い</td>
+      <td><div class="cell-wrap">短いテキスト</div></td>
+      <td><div class="cell-wrap">すごく長いテキストです。すごく長いテキストです。すごく長いテキストです。すごく長いテキストです。すごく長いテキストです。すごく長いテキストです。すごく長いテキストです。すごく長いテキストです。すごく長いテキストです。</div></td>
+      <td><div class="cell-wrap">短い</div></td>
     </tr>
     <tr>
-      <td>これも短い</td>
-      <td>めちゃめちゃ長い文章がここに入ります。めちゃめちゃ長い文章がここに入ります。めちゃめちゃ長い文章がここに入ります。</td>
-      <td>短文</td>
+      <td><div class="cell-wrap">これも短い</div></td>
+      <td><div class="cell-wrap">めちゃめちゃ長い文章がここに入ります。めちゃめちゃ長い文章がここに入ります。めちゃめちゃ長い文章がここに入ります。めちゃめちゃ長い文章がここに入ります。めちゃめちゃ長い文章がここに入ります。</div></td>
+      <td><div class="cell-wrap">短文</div></td>
     </tr>
   </tbody>
 </table>
@@ -35,16 +35,25 @@
 
 .soft-blue-table th, .soft-blue-table td {
   border: 1px solid #d0ebff;
-  padding: 10px 16px;
+  padding: 0; /* パディングはラッパーdivに移す */
   text-align: left;
   font-size: 15px;
   background: transparent;
-  height: 80px;                /* 80px固定 */
-  max-height: 80px;            /* 最大80px */
-  word-break: break-all;       /* 折り返し */
-  white-space: normal;         /* 折り返し有効 */
-  vertical-align: top;         /* 上揃え */
-  overflow-y: auto;            /* セルごとに縦スクロール */
+  height: 80px;       /* 強制固定。必ず高さ80px */
+  max-height: 80px;
+  vertical-align: top;
+  /* overflow-yは指定しない（div側で指定） */
+}
+
+.cell-wrap {
+  height: 80px;
+  max-height: 80px;
+  overflow-y: auto;
+  padding: 10px 16px;
+  box-sizing: border-box;
+  word-break: break-all;
+  white-space: pre-wrap; /* 折り返し */
+  display: block;
 }
 
 .soft-blue-table thead th {
@@ -65,10 +74,6 @@
 
 .soft-blue-table tbody tr:hover {
   background: #eaf6ff;
-}
-
-.soft-blue-table td {
-  vertical-align: top;
 }
 
 .soft-blue-table {
